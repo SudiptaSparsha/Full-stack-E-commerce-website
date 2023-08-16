@@ -49,7 +49,7 @@ public class Product {
     @UpdateTimestamp
     private Date lastUpdated;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id", nullable = false)
     private ProductCategory category;
 
