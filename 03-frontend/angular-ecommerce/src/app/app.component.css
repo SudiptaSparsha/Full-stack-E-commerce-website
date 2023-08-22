@@ -1,0 +1,7 @@
+/* Add a class to the footer to target it specifically */
+
+
+  .no-underline {
+    text-decoration: none; /* Remove the underline */
+  }
+  
