@@ -20,6 +20,8 @@ export class ProductListComponent implements OnInit {
   thePageSize : number = 12;
   theTotalElements : number = 0;
 
+  previousKeyWord: String = "";
+
   constructor(private productService : ProductService,
               private route : ActivatedRoute){}
 
@@ -56,11 +58,19 @@ export class ProductListComponent implements OnInit {
   handleSearchProducts() {
     const theKeyWord : String = this.route.snapshot.paramMap.get('keyWord')!;
 
-    this.productService.searchProducts(theKeyWord).subscribe(
-      data => {
-        this.products = data;
-      }
-    )
+    if(this.previousKeyWord != theKeyWord){
+      this.thePageNumber = 1;
+    }
+
+    this.previousKeyWord = theKeyWord; 
+
+    console.log(`keyWord = ${theKeyWord}, pageNumber = ${this.thePageNumber}`);
+
+    this.productService.searchProductsPaginate(this.thePageNumber - 1,
+                                              this.thePageSize,
+                                              theKeyWord).subscribe(
+                                                this.processResult()
+                                              );
   }
 
   handleListProducts(){
@@ -88,13 +98,17 @@ export class ProductListComponent implements OnInit {
     this.productService.getProductListPaginate(this.thePageNumber-1,
                                                 this.thePageSize,
                                                 this.currentCategoryId).subscribe(
-                                                  data => {
-                                                    this.products = data._embedded.products;
-                                                    this.thePageNumber = data.page.number + 1;
-                                                    this.thePageSize = data.page.size;
-                                                    this.theTotalElements = data.page.totalElements;
-                                                  }
+                                                  this.processResult()
                                                 );
+  }
+
+  processResult(){
+    return (data : any) => {
+      this.products = data._embedded.products;
+      this.thePageNumber = data.page.number + 1;
+      this.thePageSize = data.page.size;
+      this.theTotalElements = data.page.totalElements;
+    };
   }
 
 }
